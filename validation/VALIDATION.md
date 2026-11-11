@@ -80,3 +80,20 @@ uv run --frozen bandit -r strix/ -c pyproject.toml
 | `tests/test_runner_teardown.py` | `test_a_live_child_is_settled_before_sessions_close` | `AttributeError: 'types.SimpleNamespace' object has no attribute 'telemetry'` |
 | `tests/test_runner_teardown.py` | `test_missing_finish_is_logged_only_when_root_did_not_complete[completed-False]` | `AttributeError: 'types.SimpleNamespace' object has no attribute 'telemetry'` |
 | `tests/test_runner_teardown.py` | `test_missing_finish_is_logged_only_when_root_did_not_complete[stopped-True]` | `AttributeError: 'types.SimpleNamespace' object has no attribute 'telemetry'` |
+
+## GitHub Actions 标准环境复核
+
+CI 总结：失败。两个 Python 版本均复现同一组 20 个失败，其他四个任务通过。
+
+| 任务 | 结果 | 说明 |
+| --- | --- | --- |
+| lint | 通过 | 锁文件、Ruff、格式、mypy、Bandit |
+| tui | 通过 | Go 格式检查、vet、编译、race 测试 |
+| viewer | 通过 | npm 安装、前端构建、已提交 bundle 一致性 |
+| wheel | 通过 | wheel 构建、打包资源、干净环境安装与 CLI、云供应商依赖导入 |
+| pytest Python 3.12 | 失败 | 2514 通过、20 失败、3 个预期失败；247.38 秒 |
+| pytest Python 3.14 | 失败 | 2514 通过、20 失败、3 个预期失败；272.14 秒 |
+
+云端失败用例与本地上表相同，因此这 20 个失败并非仅由本地代理或 Python 小版本造成。CI 的 lint 任务没有执行 Pyright；本地额外运行的 `make check-all` 仍有前述 945 个 Pyright 类型错误。
+
+此次仅添加验证分支的 CI 环境变量与本文档，没有修复应用逻辑或测试用例。GitHub 登录和 CI 验证不等于 Strix 已取得模型访问凭证。

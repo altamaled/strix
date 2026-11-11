@@ -7,6 +7,10 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  STRIX_TELEMETRY: "0"
+  LITELLM_LOCAL_MODEL_COST_MAP: "True"
+
 permissions:
   contents: read
 
